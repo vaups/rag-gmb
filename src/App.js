@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Select, Card, Avatar, Rate, Typography, Button, Spin } from 'antd';
+import { Pagination, Select, Card, Avatar, Rate, Typography, Button, Spin } from 'antd';
 import './App.css';
 
 const { Option } = Select;
 const { Title, Text } = Typography;
 
 function Reviews({ reviews }) {
-    return (
-        <div className="reviews-container">
-            {reviews.map(review => (
+  return (
+      <div className="reviews-container">
+          {reviews.map(review => (
                 <Card key={review.reviewId} style={{ marginTop: 16 }}>
                     <Card.Meta
                         avatar={<Avatar src={review.reviewer.profilePhotoUrl} />}
@@ -24,11 +24,17 @@ function Reviews({ reviews }) {
 }
 
 function App() {
+    const [currentPage, setCurrentPage] = useState(1);
+    const [reviewsPerPage, setReviewsPerPage] = useState(10); // Display 10 reviews per page
     const [locations, setLocations] = useState([]);
     const [selectedLocation, setSelectedLocation] = useState('');
     const [reviews, setReviews] = useState([]);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
+    const indexOfLastReview = currentPage * reviewsPerPage;
+    const indexOfFirstReview = indexOfLastReview - reviewsPerPage;
+    const currentReviews = reviews.slice(indexOfFirstReview, indexOfLastReview);
+    
 
     const API_URL = 'https://rag-gmb-73f4cd98333b.herokuapp.com';
 
@@ -96,6 +102,13 @@ function App() {
                         ))}
                     </Select>
                     <Reviews reviews={reviews} />
+                    <Reviews reviews={currentReviews} />
+                    <Pagination
+                    current={currentPage}
+                    total={reviews.length}
+                    pageSize={reviewsPerPage}
+                    onChange={page => setCurrentPage(page)}
+                    />
                 </>
             )}
         </div>
