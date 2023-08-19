@@ -36,7 +36,7 @@ function App() {
     const currentReviews = reviews.slice(indexOfFirstReview, indexOfLastReview);
     
 
-    const API_URL = 'https://rag-gmb-73f4cd98333b.herokuapp.com/';
+    const API_URL = 'https://rag-gmb-73f4cd98333b.herokuapp.com';
 
     useEffect(() => {
       // Check if authenticated
