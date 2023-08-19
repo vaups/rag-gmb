@@ -33,18 +33,18 @@ function App() {
     const API_URL = 'https://rag-gmb-73f4cd98333b.herokuapp.com';
 
     useEffect(() => {
-        // Check if authenticated
-        fetch(`${API_URL}/isAuthenticated`)
-            .then(response => response.json())
-            .then(data => {
-                setIsAuthenticated(data.isAuthenticated);
-                setLoading(false);
-            })
-            .catch(() => {
-                setLoading(false);
-                alert('Error checking authentication status.');
-            });
-
+      // Check if authenticated
+      fetch(`${API_URL}/isAuthenticated`)
+          .then(response => response.json())
+          .then(data => {
+              setIsAuthenticated(data.isAuthenticated);
+              setLoading(false);
+          })
+          .catch(() => {
+              setLoading(false);
+              alert('Error checking authentication status.');
+          });
+  
         // Fetch locations from Flask app
         fetch(`${API_URL}/getLocations`)
             .then(response => response.json())
