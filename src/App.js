@@ -34,7 +34,7 @@ useEffect(() => {
   if (!selectedLocation) return;
 
   setLoading(true);
-  fetch(`https://rag-gmb-73f4cd98333b.herokuapp.com/fetch_reviews?location_name=${selectedLocation}`)
+  fetch(`https://backend.gmb.reedauto.com/fetch_reviews?location_name=${selectedLocation}`)
     .then(response => response.json())
     .then(data => {
       setReviews(data);
@@ -102,7 +102,7 @@ return (
 }
 
 function handleLogin() {
-fetch("https://rag-gmb-73f4cd98333b.herokuapp.com/authorize")
+fetch("https://backend.gmb.reedauto.com/authorize")
   .then(response => response.json())
   .then(data => {
     if (data.authorization_url) {
