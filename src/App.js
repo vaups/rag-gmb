@@ -34,7 +34,7 @@ useEffect(() => {
   if (!selectedLocation) return;
 
   setLoading(true);
-  fetch(`https://your-flask-app.herokuapp.com/fetch_reviews?location_name=${selectedLocation}`)
+  fetch(`https://rag-gmb-73f4cd98333b.herokuapp.com/fetch_reviews?location_name=${selectedLocation}`)
     .then(response => response.json())
     .then(data => {
       setReviews(data);
