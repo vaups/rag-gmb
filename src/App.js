@@ -1,118 +1,69 @@
-import React, { useState, useEffect } from 'react';
-import { Pagination, Select, Card, Avatar, Rate, Typography, Button, Spin } from 'antd';
-import './App.css';
+import { Layout, List, Button, message } from "antd";
+import { useState, useEffect } from "react";
 
-const { Option } = Select;
-const { Title, Text } = Typography;
-
-function Reviews({ reviews }) {
-  return (
-      <div className="reviews-container">
-          {reviews.map(review => (
-                <Card key={review.reviewId} style={{ marginTop: 16 }}>
-                    <Card.Meta
-                        avatar={<Avatar src={review.reviewer.profilePhotoUrl} />}
-                        title={review.reviewer.displayName}
-                        description={review.comment}
-                    />
-                    <Rate disabled value={parseInt(review.starRating, 10)} />
-                    <Text type="secondary">{new Date(review.createTime).toLocaleDateString()}</Text>
-                </Card>
-            ))}
-        </div>
-    );
-}
+const { Header, Content, Footer } = Layout;
 
 function App() {
-    const [currentPage, setCurrentPage] = useState(1);
-    const [reviewsPerPage, setReviewsPerPage] = useState(10); // Display 10 reviews per page
-    const [locations, setLocations] = useState([]);
-    const [selectedLocation, setSelectedLocation] = useState('');
-    const [reviews, setReviews] = useState([]);
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [loading, setLoading] = useState(true);
-    const indexOfLastReview = currentPage * reviewsPerPage;
-    const indexOfFirstReview = indexOfLastReview - reviewsPerPage;
-    const currentReviews = reviews.slice(indexOfFirstReview, indexOfLastReview);
-    
+  const [reviews, setReviews] = useState([]);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-    const API_URL = 'https://rag-gmb-73f4cd98333b.herokuapp.com/';
-
-    useEffect(() => {
-      // Check if authenticated
-      fetch(`${API_URL}/isAuthenticated`)
-          .then(response => response.json())
-          .then(data => {
-              setIsAuthenticated(data.isAuthenticated);
-              setLoading(false);
-          })
-          .catch(() => {
-              setLoading(false);
-              alert('Error checking authentication status.');
-          });
-  
-        // Fetch locations from Flask app
-        fetch(`${API_URL}/getLocations`)
-            .then(response => response.json())
-            .then(data => {
-                setLocations(data.locations);
-            })
-            .catch(() => {
-                alert('Error fetching locations.');
-            });
-    }, []);
-
-    useEffect(() => {
-        if (selectedLocation) {
-            setLoading(true);
-            fetch(`${API_URL}/getReviews/${selectedLocation}`)
-                .then(response => response.json())
-                .then(data => {
-                    setReviews(data.reviews);
-                    setLoading(false);
-                })
-                .catch(() => {
-                    setLoading(false);
-                    alert('Error fetching reviews.');
-                });
+  useEffect(() => {
+    // Fetch reviews from Flask backend
+    fetch("https://your-flask-app.herokuapp.com/fetch_reviews")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
         }
-    }, [selectedLocation]);
+        return response.json();
+      })
+      .then((data) => {
+        setReviews(data);
+        setIsAuthenticated(true);
+      })
+      .catch((error) => {
+        console.error("Error fetching reviews:", error);
+        message.error("Failed to fetch reviews. Please try again later.");
+      });
+  }, []);
 
-    if (loading) {
-        return <Spin size="large" />;
-    }
-
-    return (
-        <div className="app-container">
-            <Title level={1}>Reviews</Title>
-            {!isAuthenticated ? (
-                <Button type="primary" onClick={() => window.location.href = `${API_URL}/login`}>
-                    Authenticate with Google
-                </Button>
-            ) : (
-                <>
-                    <Select 
-                        style={{ width: 300 }} 
-                        placeholder="Select a location" 
-                        value={selectedLocation} 
-                        onChange={value => setSelectedLocation(value)}
-                    >
-                        {locations.map(location => (
-                            <Option key={location} value={location}>{location}</Option>
-                        ))}
-                    </Select>
-                    <Reviews reviews={reviews} />
-                    <Reviews reviews={currentReviews} />
-                    <Pagination
-                    current={currentPage}
-                    total={reviews.length}
-                    pageSize={reviewsPerPage}
-                    onChange={page => setCurrentPage(page)}
-                    />
-                </>
+  return (
+    <Layout>
+      <Header>
+        <div className="logo" />
+        {isAuthenticated ? (
+          <span>Welcome!</span>
+        ) : (
+          <Button type="primary" onClick={handleLogin}>
+            Login
+          </Button>
+        )}
+      </Header>
+      <Content>
+        {isAuthenticated ? (
+          <List
+            itemLayout="horizontal"
+            dataSource={reviews}
+            renderItem={(review) => (
+              <List.Item>
+                <List.Item.Meta
+                  title={review.authorName}
+                  description={review.text}
+                />
+              </List.Item>
             )}
-        </div>
-    );
+          />
+        ) : (
+          <p>Please log in to view reviews.</p>
+        )}
+      </Content>
+      <Footer>My Business Reviews ©2023</Footer>
+    </Layout>
+  );
+}
+
+function handleLogin() {
+  // Redirect to Flask backend for authentication
+  window.location.href = "https://rag-gmb-73f4cd98333b.herokuapp.com/authorize";
 }
 
 export default App;
