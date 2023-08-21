@@ -1,7 +1,7 @@
-import { Layout, List, Button, message, Select, Spin } from "antd";
+import { Layout, List, Button, message, Select, Spin, Menu } from "antd";
 import { useState, useEffect } from "react";
 
-const { Header, Content, Footer } = Layout;
+const { Sider, Content, Footer } = Layout;
 const { Option } = Select;
 
 function App() {
@@ -30,53 +30,54 @@ function App() {
     "Reed Buick GMC Collision Center": ("109231983509135903650", "10315051056232587965")
 };
 
-  useEffect(() => {
-    if (!selectedLocation) return;
+useEffect(() => {
+  if (!selectedLocation) return;
 
-    setLoading(true);
-    fetch(`https://your-flask-app.herokuapp.com/fetch_reviews?location_name=${selectedLocation}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setReviews(data);
-        setIsAuthenticated(true);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching reviews:", error);
-        message.error("Failed to fetch reviews. Please try again later.");
-        setLoading(false);
-      });
-  }, [selectedLocation]);
+  setLoading(true);
+  fetch(`https://your-flask-app.herokuapp.com/fetch_reviews?location_name=${selectedLocation}`)
+    .then(response => response.json())
+    .then(data => {
+      setReviews(data);
+      setIsAuthenticated(true);
+      setLoading(false);
+    })
+    .catch(error => {
+      console.error("Error fetching reviews:", error);
+      message.error("Failed to fetch reviews. Please try again later.");
+      setLoading(false);
+    });
+}, [selectedLocation]);
 
-  return (
+return (
+  <Layout>
+    <Sider width={200}>
+      <Menu mode="vertical" defaultSelectedKeys={['1']}>
+        <Menu.Item key="1">Reviews</Menu.Item>
+        <Menu.Item key="2">Approval Board</Menu.Item>
+        <Menu.Item key="3">Facebook</Menu.Item>
+        <Menu.Item key="4">Analytics</Menu.Item>
+      </Menu>
+      {isAuthenticated ? (
+        <>
+          <span>Welcome!</span>
+          <Select
+            placeholder="Select a location"
+            onChange={value => setSelectedLocation(value)}
+          >
+            {Object.keys(LOCATIONS).map(location => (
+              <Option key={location} value={location}>
+                {location}
+              </Option>
+            ))}
+          </Select>
+        </>
+      ) : (
+        <Button type="primary" onClick={handleLogin} style={{ background: "linear-gradient(to right, #ff7e5f, #feb47b)", border: "none" }}>
+          Login
+        </Button>
+      )}
+    </Sider>
     <Layout>
-      <Header>
-        <div className="logo" />
-        {isAuthenticated ? (
-          <>
-            <span>Welcome!</span>
-            <Select
-              placeholder="Select a location"
-              onChange={(value) => setSelectedLocation(value)}
-            >
-              {Object.keys(LOCATIONS).map((location) => (
-                <Option key={location} value={location}>
-                  {location}
-                </Option>
-              ))}
-            </Select>
-          </>
-        ) : (
-          <Button type="primary" onClick={handleLogin}>
-            Login
-          </Button>
-        )}
-      </Header>
       <Content>
         {loading ? (
           <Spin tip="Loading reviews..." />
@@ -84,12 +85,9 @@ function App() {
           <List
             itemLayout="horizontal"
             dataSource={reviews}
-            renderItem={(review) => (
+            renderItem={review => (
               <List.Item>
-                <List.Item.Meta
-                  title={review.authorName}
-                  description={review.text}
-                />
+                <List.Item.Meta title={review.authorName} description={review.text} />
               </List.Item>
             )}
           />
@@ -99,11 +97,20 @@ function App() {
       </Content>
       <Footer>My Business Reviews ©2023</Footer>
     </Layout>
-  );
+  </Layout>
+);
 }
 
 function handleLogin() {
-  window.location.href = "https://rag-gmb-73f4cd98333b.herokuapp.com/authorize";
+fetch("https://rag-gmb-73f4cd98333b.herokuapp.com/authorize")
+  .then(response => response.json())
+  .then(data => {
+    if (data.authorization_url) {
+      window.location.href = data.authorization_url;
+    } else {
+      message.error("Failed to initiate authentication. Please try again.");
+    }
+  });
 }
 
 export default App;
