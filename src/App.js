@@ -5,10 +5,13 @@ const { Sider, Content, Footer } = Layout;
 const { Option } = Select;
 
 function App() {
+  // State Hooks
   const [reviews, setReviews] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  // Constants
   const LOCATIONS = {
     "Reed Jeep Chrysler Dodge Ram of Kansas City Service Center": ("107525660123223074874", "6602925040958900944"),
     "Reed Jeep of Kansas City": ("107525660123223074874", "1509419292313302599"),
@@ -30,6 +33,7 @@ function App() {
     "Reed Buick GMC Collision Center": ("109231983509135903650", "10315051056232587965")
 };
 
+// Fetch reviews when a location is selected
 useEffect(() => {
   if (!selectedLocation) return;
 
@@ -59,17 +63,14 @@ return (
       </Menu>
       {isAuthenticated ? (
         <>
-          <span>Welcome!</span>
-          <Select
-            placeholder="Select a location"
-            onChange={value => setSelectedLocation(value)}
-          >
-            {Object.keys(LOCATIONS).map(location => (
-              <Option key={location} value={location}>
-                {location}
-              </Option>
-            ))}
-          </Select>
+        <span>Welcome!</span>
+            <Select placeholder="Select a location" onChange={value => setSelectedLocation(value)}>
+              {Object.keys(LOCATIONS).map(location => (
+                <Option key={location} value={location}>
+                  {location}
+                </Option>
+              ))}
+            </Select>
         </>
       ) : (
         <Button type="primary" onClick={handleLogin} style={{ background: "linear-gradient(to right, #ff7e5f, #feb47b)", border: "none" }}>
@@ -101,16 +102,17 @@ return (
 );
 }
 
+// Helper function to handle user login
 function handleLogin() {
-fetch("https://backend.gmb.reedauto.com/authorize")
-  .then(response => response.json())
-  .then(data => {
-    if (data.authorization_url) {
-      window.location.href = data.authorization_url;
-    } else {
-      message.error("Failed to initiate authentication. Please try again.");
-    }
-  });
+  fetch("https://backend.gmb.reedauto.com/authorize")
+    .then(response => response.json())
+    .then(data => {
+      if (data.authorization_url) {
+        window.location.href = data.authorization_url;
+      } else {
+        message.error("Failed to initiate authentication. Please try again.");
+      }
+    });
 }
 
 export default App;
