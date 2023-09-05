@@ -1,15 +1,5 @@
-import {
-  Layout,
-  List,
-  Button,
-  message,
-  Select,
-  Spin,
-  Menu,
-  Modal,
-  Input,
-} from "antd";
-import { useState, useEffect, useMemo } from "react";
+import { Layout, List, Button, message, Select, Spin, Menu } from "antd";
+import { useState, useEffect } from "react";
 
 const { Sider, Content, Footer } = Layout;
 const { Option } = Select;
@@ -20,14 +10,9 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [loginLoading, setLoginLoading] = useState(false);
 
   // Constants
-  const LOCATIONS = useMemo(() => {
-    return {
+  const LOCATIONS = {
       "Reed Jeep Chrysler Dodge Ram of Kansas City Service Center": [
         "107525660123223074874",
         "6602925040958900944",
@@ -92,128 +77,87 @@ function App() {
         "10315051056232587965",
       ],
     };
-  }, []);
 
-  // Helper Functions
-  const showModal = () => {
-    setIsModalVisible(true);
-  };
+// Fetch reviews when a location is selected
+useEffect(() => {
+  if (!selectedLocation) return;
 
-  const handleCancel = () => {
-    setIsModalVisible(false);
-  };
+  setLoading(true);
+  fetch(`https://backend.gmb.reedauto.com/fetch_reviews?location_name=${selectedLocation}`)
+    .then(response => response.json())
+    .then(data => {
+      setReviews(data);
+      setIsAuthenticated(true);
+      setLoading(false);
+    })
+    .catch(error => {
+      console.error("Error fetching reviews:", error);
+      message.error("Failed to fetch reviews. Please try again later.");
+      setLoading(false);
+    });
+}, [selectedLocation]);
 
-  async function handleLogin() {
-    setLoginLoading(true);
-    try {
-      const response = await fetch("https://backend.gmb.reedauto.com/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
-      });
-      if (response.status === 200) {
-        setIsAuthenticated(true);
-        message.success("Logged in successfully!");
-      } else {
-        message.error("Failed to initiate authentication. Please try again.");
-      }
-    } catch (error) {
-      message.error("An error occurred. Please try again.");
-    }
-    setLoginLoading(false);
-  }
-
-  const handleOk = () => {
-    handleLogin();
-    setTimeout(() => {
-      setIsModalVisible(false);
-    }, 3000);
-  };
-
-  useEffect(() => {
-    if (!selectedLocation) return;
-
-    setLoading(true);
-    const [accountId, locationId] = LOCATIONS[selectedLocation];
-    fetch(`https://backend.gmb.reedauto.com/fetch_reviews?account_id=${accountId}&location_id=${locationId}`)
-      .then((response) => response.json())
-      .then((data) => {
-        setReviews(data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        message.error("Failed to fetch reviews. Please try again later.");
-        setLoading(false);
-      });
-  }, [selectedLocation, LOCATIONS]);
-
-  return (
-    <Layout>
-      <Sider width={200}>
-        <Menu mode="vertical" defaultSelectedKeys={["1"]}>
-          <Menu.Item key="1">Reviews</Menu.Item>
-          {/* Other Menu Items */}
-        </Menu>
-        {isAuthenticated ? (
-          <span>Welcome!</span>
-        ) : (
-          <Button type="primary" onClick={showModal}>
-            Login
-          </Button>
-        )}
-      </Sider>
-      <Layout>
-        <Content>
-          {isAuthenticated && (
-            <Select
-              placeholder="Select a location"
-              onChange={(value) => setSelectedLocation(value)}
-            >
-              {Object.keys(LOCATIONS).map((location) => (
+return (
+  <Layout>
+    <Sider width={200}>
+      <Menu mode="vertical" defaultSelectedKeys={['1']}>
+        <Menu.Item key="1">Reviews</Menu.Item>
+        <Menu.Item key="2">Approval Board</Menu.Item>
+        <Menu.Item key="3">Facebook</Menu.Item>
+        <Menu.Item key="4">Analytics</Menu.Item>
+      </Menu>
+      {isAuthenticated ? (
+        <>
+        <span>Welcome!</span>
+            <Select placeholder="Select a location" onChange={value => setSelectedLocation(value)}>
+              {Object.keys(LOCATIONS).map(location => (
                 <Option key={location} value={location}>
                   {location}
                 </Option>
               ))}
             </Select>
-          )}
-          {loading ? (
-            <Spin tip="Loading reviews..." />
-          ) : (
-            <List
-              itemLayout="horizontal"
-              dataSource={reviews}
-              renderItem={(review) => (
-                <List.Item>
-                  <List.Item.Meta
-                    title={review.authorName}
-                    description={review.text}
-                  />
-                </List.Item>
-              )}
-            />
-          )}
-        </Content>
-        <Footer>My Business Reviews ©2023</Footer>
-      </Layout>
-      <Modal
-        title="Login"
-        visible={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-      >
-        <Input
-          placeholder="Username"
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <Input.Password
-          placeholder="Password"
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </Modal>
+        </>
+      ) : (
+        <Button type="primary" onClick={handleLogin} style={{ background: "linear-gradient(to right, #ff7e5f, #feb47b)", border: "none" }}>
+          Login
+        </Button>
+      )}
+    </Sider>
+    <Layout>
+      <Content>
+        {loading ? (
+          <Spin tip="Loading reviews..." />
+        ) : isAuthenticated ? (
+          <List
+            itemLayout="horizontal"
+            dataSource={reviews}
+            renderItem={review => (
+              <List.Item>
+                <List.Item.Meta title={review.authorName} description={review.text} />
+              </List.Item>
+            )}
+          />
+        ) : (
+          <p>Please log in to view reviews.</p>
+        )}
+      </Content>
+      <Footer>My Business Reviews ©2023</Footer>
     </Layout>
-  );
+  </Layout>
+);
+}
+
+// Helper function to handle user login
+function handleLogin() {
+  fetch("https://backend.gmb.reedauto.com/authorize")
+    .then(response => response.json())
+    .then(data => {
+      if (data.authorization_url) {
+        window.location.href = data.authorization_url;
+      } else {
+        message.error("Failed to initiate authentication. Please try again.");
+      }
+    });
 }
 
 export default App;
