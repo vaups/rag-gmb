@@ -5,11 +5,11 @@ const { Sider, Content, Footer } = Layout;
 const { Option } = Select;
 
 function App() {
-  // State Hooks
-  const [reviews, setReviews] = useState([]);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState(null);
-  const [loading, setLoading] = useState(false);
+// State Hooks
+const [reviews, setReviews] = useState([]);
+const [isAuthenticated, setIsAuthenticated] = useState(false); 
+const [selectedLocation, setSelectedLocation] = useState(null);
+const [loading, setLoading] = useState(false);
 
 // Constants
 const LOCATIONS = {
@@ -32,7 +32,6 @@ const LOCATIONS = {
   "Reed Buick GMC Service Center": ["109231983509135903650", "9597638825461585665"],
   "Reed Buick GMC Collision Center": ["109231983509135903650", "10315051056232587965"]
 };
-
 
 // Fetch reviews when a location is selected
 useEffect(() => {
@@ -101,19 +100,29 @@ return (
     </Layout>
   </Layout>
 );
-}
 
-// Helper function to handle user login
-function handleLogin() {
-  fetch("https://backend.gmb.reedauto.com/authorize")
-    .then(response => response.json())
-    .then(data => {
-      if (data.authorization_url) {
-        window.location.href = data.authorization_url;
+  // Move handleLogin inside the App component
+  async function handleLogin() {
+    try {
+      const response = await fetch("https://backend.gmb.reedauto.com/login", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: 'your_username', password: 'your_password' })  // Replace with actual username and password
+      });
+      const data = await response.json();
+      
+      if (response.status === 200) {
+        setIsAuthenticated(true);  // Now it should work
       } else {
         message.error("Failed to initiate authentication. Please try again.");
       }
-    });
+    } catch (error) {
+      console.error("An error occurred during login:", error);
+      message.error("An error occurred. Please try again.");
+    }
+  }
 }
 
 export default App;
