@@ -21,12 +21,17 @@ function App() {
   };
 
   useEffect(() => {
-    const token_id = localStorage.getItem("token_id");
-    if (token_id) {
-      setIsAuthenticated(true);
-    } else {
-      checkAuthentication();
-    }
+    const updateAuth = (e) => {
+      if (e.key === "token_id") {
+        checkAuthentication();
+      }
+    };
+
+    window.addEventListener('storage', updateAuth);
+    
+    return () => {
+      window.removeEventListener('storage', updateAuth);
+    };
   }, []);
 
   const handleLogin = () => {
@@ -36,10 +41,10 @@ function App() {
         if (data.authorization_url) {
           window.location.href = data.authorization_url;
         } else if (data.token_id) {
-          localStorage.setItem("token_id", data.token_id);
-          setIsAuthenticated(true);
-          // Optionally re-check authentication status here
-          checkAuthentication();
+          // Update the `isAuthenticated` state to `true` after the login request has been made.
+          setTimeout(() => {
+            setIsAuthenticated(true);
+          }, 1000);
         } else {
           message.error("Failed to initiate authentication. Please try again.");
         }
