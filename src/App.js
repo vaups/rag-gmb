@@ -5,53 +5,53 @@ const { Sider, Content, Footer } = Layout;
 const { Option } = Select;
 
 function App() {
-  // State Hooks
   const [reviews, setReviews] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Check authentication status with the backend
-    fetch("https://backend.gmb.reedauto.com/check_auth")
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.isAuthenticated) {
-          setIsAuthenticated(true);
-        }
-      });
+    const token_id = localStorage.getItem("token_id");
+    if (token_id) {
+      setIsAuthenticated(true);
+    } else {
+      fetch("https://backend.gmb.reedauto.com/check_auth")
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.isAuthenticated) {
+            setIsAuthenticated(true);
+          }
+        });
+    }
   }, []);
 
-  // Helper function to handle user login
-  function handleLogin() {
+  const handleLogin = () => {
     fetch("https://backend.gmb.reedauto.com/authorize")
       .then((response) => response.json())
       .then((data) => {
         if (data.authorization_url) {
-          // Redirect user for OAuth2 login
           window.location.href = data.authorization_url;
         } else if (data.token_id) {
-          // Store the token_id in local storage
           localStorage.setItem("token_id", data.token_id);
           setIsAuthenticated(true);
         } else {
           message.error("Failed to initiate authentication. Please try again.");
         }
       });
-  }
+  };
 
   useEffect(() => {
     if (!selectedLocation) return;
 
     setLoading(true);
 
-    const token_id = localStorage.getItem("token_id"); // Retrieve the token_id from local storage
+    const token_id = localStorage.getItem("token_id");
 
     fetch(
       `https://backend.gmb.reedauto.com/fetch_reviews?location_name=${selectedLocation}`,
       {
         headers: {
-          "Token-ID": token_id, // Send token_id in custom header
+          "Token-ID": token_id,
         },
       }
     )
@@ -139,9 +139,8 @@ function App() {
       <Sider width={200}>
         <Menu mode="vertical" defaultSelectedKeys={["1"]}>
           <Menu.Item key="1">Reviews</Menu.Item>
-          <Menu.Item key="2">Approval Board</Menu.Item>
-          <Menu.Item key="3">Facebook</Menu.Item>
-          <Menu.Item key="4">Analytics</Menu.Item>
+          <Menu.Item key="1">Maia</Menu.Item>
+          <Menu.Item key="1">Jake</Menu.Item>
         </Menu>
         {isAuthenticated ? (
           <>
@@ -158,14 +157,7 @@ function App() {
             </Select>
           </>
         ) : (
-          <Button
-            type="primary"
-            onClick={handleLogin}
-            style={{
-              background: "linear-gradient(to right, #ff7e5f, #feb47b)",
-              border: "none",
-            }}
-          >
+          <Button type="primary" onClick={handleLogin}>
             Login
           </Button>
         )}
