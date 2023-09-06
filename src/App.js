@@ -25,12 +25,13 @@ const App = () => {
           window.location.href = data.authorization_url; // This will reload the page
         } else if (data.token_id) {
           localStorage.setItem("token_id", data.token_id);
-          setIsAuthenticated(true);
+          setIsAuthenticated(true);  // <-- Set isAuthenticated to true here
         } else {
           message.error("Failed to initiate authentication. Please try again.");
         }
       });
-  };  
+  };
+  
 
   useEffect(() => {
     if (!selectedLocation) return;
