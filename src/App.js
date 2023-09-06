@@ -89,10 +89,12 @@ useEffect(() => {
       setReviews(data);
       setIsAuthenticated(true);
       setLoading(false);
+      console.log("Is Authenticated: ", isAuthenticated);
+      console.log("Selected Location: ", selectedLocation);
     })
     .catch(error => {
       console.error("Error fetching reviews:", error);
-      message.error("Failed to fetch reviews. Please try again later.");
+      message.error(`Failed to fetch reviews: ${error}`);
       setLoading(false);
     });
 }, [selectedLocation]);
