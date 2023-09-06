@@ -80,23 +80,34 @@ function App() {
 
 // Fetch reviews when a location is selected
 useEffect(() => {
+  // Check if a token exists (you might want to check this in a more secure way in production)
+  if (localStorage.getItem('token')) {
+    setIsAuthenticated(true);
+  }
+}, []);
+
+useEffect(() => {
   if (!selectedLocation) return;
 
   setLoading(true);
-  fetch(`https://backend.gmb.reedauto.com/fetch_reviews?location_name=${selectedLocation}`)
-    .then(response => response.json())
-    .then(data => {
-      setReviews(data);
-      setIsAuthenticated(true);
-      setLoading(false);
-      console.log("Is Authenticated: ", isAuthenticated);
-      console.log("Selected Location: ", selectedLocation);
-    })
-    .catch(error => {
-      console.error("Error fetching reviews:", error);
-      message.error(`Failed to fetch reviews: ${error}`);
-      setLoading(false);
-    });
+
+  const token = localStorage.getItem('token'); // Retrieve the token from local storage
+
+  fetch(`https://backend.gmb.reedauto.com/fetch_reviews?location_name=${selectedLocation}`, {
+    headers: {
+      'Authorization': `Bearer ${token}` // Send token in Authorization header
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    setReviews(data);
+    setLoading(false);
+  })
+  .catch(error => {
+    console.error("Error fetching reviews:", error);
+    message.error(`Failed to fetch reviews: ${error}`);
+    setLoading(false);
+  });
 }, [selectedLocation]);
 
 return (
