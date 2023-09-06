@@ -1,5 +1,7 @@
-import { Layout, List, Button, message, Select, Spin, Menu, Sider, Content, Footer, Option } from "antd";
 import React, { useState, useEffect } from "react";
+import { Layout, List, Button, message, Select, Spin, Menu } from "antd";
+const { Sider, Content, Footer } = Layout;
+const { Option } = Select;
 
 const App = () => {
   const [reviews, setReviews] = useState([]);
