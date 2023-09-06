@@ -20,7 +20,9 @@ const App = () => {
   }, []);
   
   const handleLogin = () => {
-    fetch("https://backend.gmb.reedauto.com/authorize")
+    fetch("https://backend.gmb.reedauto.com/authorize", {
+    credentials: 'include'  // Include credentials
+  })
       .then((response) => response.json())
       .then((data) => {
         if (data.authorization_url) {
@@ -63,7 +65,9 @@ const App = () => {
   }, [selectedLocation]);
 
   const checkAuthentication = () => {
-    fetch("https://backend.gmb.reedauto.com/check_auth")
+    fetch("https://backend.gmb.reedauto.com/check_auth", {
+      credentials: 'include'  // Include credentials
+    })
       .then((response) => response.json())
       .then((data) => {
         if (data.isAuthenticated) {
