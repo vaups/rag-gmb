@@ -1,37 +1,14 @@
 import { Layout, List, Button, message, Select, Spin, Menu } from "antd";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
-const { Sider, Content, Footer } = Layout;
-const { Option } = Select;
-
-function App() {
+const App = () => {
   const [reviews, setReviews] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const checkAuthentication = () => {
-    fetch("https://backend.gmb.reedauto.com/check_auth")
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.isAuthenticated) {
-          setIsAuthenticated(true);
-        }
-      });
-  };
-
   useEffect(() => {
-    const updateAuth = (e) => {
-      if (e.key === "token_id") {
-        checkAuthentication();
-      }
-    };
-
-    window.addEventListener('storage', updateAuth);
-    
-    return () => {
-      window.removeEventListener('storage', updateAuth);
-    };
+    checkAuthentication();
   }, []);
 
   const handleLogin = () => {
@@ -41,10 +18,7 @@ function App() {
         if (data.authorization_url) {
           window.location.href = data.authorization_url;
         } else if (data.token_id) {
-          // Update the `isAuthenticated` state to `true` after the login request has been made.
-          setTimeout(() => {
-            setIsAuthenticated(true);
-          }, 1000);
+          setIsAuthenticated(true);
         } else {
           message.error("Failed to initiate authentication. Please try again.");
         }
@@ -77,6 +51,16 @@ function App() {
         setLoading(false);
       });
   }, [selectedLocation]);
+
+  const checkAuthentication = () => {
+    fetch("https://backend.gmb.reedauto.com/check_auth")
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.isAuthenticated) {
+          setIsAuthenticated(true);
+        }
+      });
+  };
 
   // Constants
   const LOCATIONS = {
