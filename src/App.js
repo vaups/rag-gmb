@@ -10,18 +10,22 @@ function App() {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const checkAuthentication = () => {
+    fetch("https://backend.gmb.reedauto.com/check_auth")
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.isAuthenticated) {
+          setIsAuthenticated(true);
+        }
+      });
+  };
+
   useEffect(() => {
     const token_id = localStorage.getItem("token_id");
     if (token_id) {
       setIsAuthenticated(true);
     } else {
-      fetch("https://backend.gmb.reedauto.com/check_auth")
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.isAuthenticated) {
-            setIsAuthenticated(true);
-          }
-        });
+      checkAuthentication();
     }
   }, []);
 
@@ -34,6 +38,8 @@ function App() {
         } else if (data.token_id) {
           localStorage.setItem("token_id", data.token_id);
           setIsAuthenticated(true);
+          // Optionally re-check authentication status here
+          checkAuthentication();
         } else {
           message.error("Failed to initiate authentication. Please try again.");
         }
