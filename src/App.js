@@ -1,4 +1,4 @@
-import { Layout, List, Button, message, Select, Spin, Menu } from "antd";
+import { Layout, List, Button, message, Select, Spin, Menu, Sider, Content, Footer, Option } from "antd";
 import React, { useState, useEffect } from "react";
 
 const App = () => {
@@ -8,22 +8,29 @@ const App = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    checkAuthentication();
+    // Initial check for authentication based on local storage.
+    const token_id = localStorage.getItem("token_id");
+    if (token_id) {
+      setIsAuthenticated(true);
+    } else {
+      checkAuthentication(); // If not found in local storage, check server.
+    }
   }, []);
-
+  
   const handleLogin = () => {
     fetch("https://backend.gmb.reedauto.com/authorize")
       .then((response) => response.json())
       .then((data) => {
         if (data.authorization_url) {
-          window.location.href = data.authorization_url;
+          window.location.href = data.authorization_url; // This will reload the page
         } else if (data.token_id) {
+          localStorage.setItem("token_id", data.token_id);
           setIsAuthenticated(true);
         } else {
           message.error("Failed to initiate authentication. Please try again.");
         }
       });
-  };
+  };  
 
   useEffect(() => {
     if (!selectedLocation) return;
