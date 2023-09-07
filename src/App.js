@@ -25,13 +25,12 @@ const App = () => {
     })
     .then((response) => response.json())
     .then((data) => {
-      if (data.access_token) {
-        localStorage.setItem("access_token", data.access_token);  // Store the access token here
-        setIsAuthenticated(true);
-        } else {
-          message.error("Failed to initiate authentication. Please try again.");
-        }
-      });
+      if (data.authorization_url) {
+        window.open(data.authorization_url, '_blank'); // Open the Google login in a new tab
+      } else {
+        message.error("Failed to initiate authentication. Please try again.");
+      }
+    });
   };
   
   useEffect(() => {
