@@ -18,58 +18,58 @@ const App = () => {
       checkAuthentication(); // If not found in local storage, check server.
     }
   }, []);
-  
+
   const handleLogin = () => {
     fetch("https://backend.gmb.reedauto.com/authorize", {
-      credentials: 'include'  // Include credentials
+      credentials: "include", // Include credentials
     })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.authorization_url) {
-        // Redirect the user to Google's OAuth2 authorization page
-        window.location.href = data.authorization_url;
-      } else {
-        message.error("Failed to initiate authentication. Please try again.");
-      }
-    });
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.authorization_url) {
+          // Redirect the user to Google's OAuth2 authorization page
+          window.location.href = data.authorization_url;
+        } else {
+          message.error("Failed to initiate authentication. Please try again.");
+        }
+      });
   };
-  
+
   useEffect(() => {
     if (!selectedLocation) return;
-  
+
     setLoading(true);
-  
+
     const token = localStorage.getItem("access_token");
-  
+
     fetch(
       `https://backend.gmb.reedauto.com/fetch_reviews?location_name=${selectedLocation}`,
       {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       }
     )
-    .then((response) => response.json())
-    .then((data) => {
-      console.log("Entire data object:", JSON.stringify(data, null, 2)); // Debug line
-      if (Array.isArray(data)) {
-        setReviews(data);
-      } else {
-        console.warn("Received data is not an array:", data);
-        setReviews([]);  // Reset reviews if data is not valid
-      }
-      setLoading(false);
-    })
-    .catch((error) => {
-      console.error("Error fetching reviews:", error);
-      message.error(`Failed to fetch reviews: ${error}`);
-      setLoading(false);
-    });
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Entire data object:", JSON.stringify(data, null, 2)); // Debug line
+        if (Array.isArray(data)) {
+          setReviews(data);
+        } else {
+          console.warn("Received data is not an array:", data);
+          setReviews([]); // Reset reviews if data is not valid
+        }
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching reviews:", error);
+        message.error(`Failed to fetch reviews: ${error}`);
+        setLoading(false);
+      });
   }, [selectedLocation]);
 
   const checkAuthentication = () => {
     fetch("https://backend.gmb.reedauto.com/check_auth", {
-      credentials: 'include'  // Include credentials
+      credentials: "include", // Include credentials
     })
       .then((response) => response.json())
       .then((data) => {
@@ -175,30 +175,49 @@ const App = () => {
         )}
       </Sider>
       <Layout>
-        <Content>
-          {loading ? (
-            <Spin tip="Loading reviews..." />
-          ) : isAuthenticated ? (
-            <List
-              itemLayout="horizontal"
-              dataSource={reviews}
-              renderItem={(review) => (
-                <List.Item>
-                  <List.Item.Meta
-                    title={review.authorName}
-                    description={review.text}
+        <List
+          itemLayout="horizontal"
+          dataSource={reviews}
+          renderItem={(review) => (
+            <List.Item>
+              <List.Item.Meta
+                avatar={
+                  <img
+                    src={review.reviewer.profilePhotoUrl}
+                    alt="Profile"
+                    style={{ width: 50, height: 50 }}
                   />
-                </List.Item>
-              )}
-            />
-          ) : (
-            <p>Please log in to view reviews.</p>
+                }
+                title={
+                  <>
+                    <div>
+                      <strong>Time of Review:</strong>{" "}
+                      {new Date(review.createTime).toLocaleString()}
+                    </div>
+                    <div>
+                      <strong>Name of Reviewer:</strong>{" "}
+                      {review.reviewer.displayName}
+                    </div>
+                  </>
+                }
+                description={
+                  <>
+                    <div>
+                      <strong>Stars of Review:</strong> {review.starRating}
+                    </div>
+                    <div>
+                      <strong>Comment:</strong> {review.comment}
+                    </div>
+                  </>
+                }
+              />
+            </List.Item>
           )}
-        </Content>
+        />
         <Footer>My Business Reviews ©2023</Footer>
       </Layout>
     </Layout>
   );
-}
+};
 
 export default App;
