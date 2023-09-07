@@ -1,6 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { Layout, List, Button, message, Select, Spin, Menu } from "antd";
-const { Sider, Content, Footer } = Layout;
+import React, { useState, useEffect } from 'react';
+import { Layout, List, Menu, Avatar, Select, Button, message } from 'antd';
+import { UserOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { theme } from 'antd';
+
+const { Sider, Footer } = Layout;
 const { Option } = Select;
 
 const App = () => {
@@ -9,6 +12,9 @@ const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [loading, setLoading] = useState(false);
+  const gradientStyle = {
+    background: 'linear-gradient(to right, #ff9966, #ff5e62)',
+  };
 
   // Effect for initial authentication check
   useEffect(() => {
@@ -174,21 +180,42 @@ const App = () => {
       "10315051056232587965",
     ],
   };
-
   return (
     <Layout>
-      <Sider width={300}>
-        <Menu mode="vertical" defaultSelectedKeys={["1"]}>
+      <Sider width={300} style={gradientStyle}>
+        <Menu mode="vertical" defaultSelectedKeys={['1']}>
           <Menu.Item key="1">Reviews</Menu.Item>
           <Menu.Item key="2">Approval Board</Menu.Item>
           <Menu.Item key="3">Facebook</Menu.Item>
         </Menu>
-        {isAuthenticated ? (
+        <div style={{ display: 'flex', alignItems: 'center', padding: '10px' }}>
+          {isAuthenticated ? (
+            <>
+              <Avatar icon={<CheckCircleOutlined />} />
+              <span style={{ marginLeft: '10px', fontFamily: 'Arial, sans-serif' }}>Logged In</span>
+            </>
+          ) : (
+            <Menu mode="inline">
+              <Menu.Item
+                key="login"
+                icon={<UserOutlined />}
+                onClick={handleLogin}
+                style={{ fontFamily: 'Arial, sans-serif', transition: '0.3s', cursor: 'pointer' }}
+                onMouseOver={(e) => (e.currentTarget.style.color = '#ff5e62')}
+                onMouseOut={(e) => (e.currentTarget.style.color = '')}
+              >
+                Login
+              </Menu.Item>
+            </Menu>
+          )}
+        </div>
+        {isAuthenticated && (
           <>
-            <span>Welcome!</span>
+            <span style={{ fontFamily: 'Arial, sans-serif' }}>Welcome!</span>
             <Select
               placeholder="Select a location"
               onChange={(value) => setSelectedLocation(value)}
+              style={{ fontFamily: 'Arial, sans-serif' }}
             >
               {Object.keys(LOCATIONS).map((location) => (
                 <Option key={location} value={location}>
@@ -197,10 +224,6 @@ const App = () => {
               ))}
             </Select>
           </>
-        ) : (
-          <Button type="primary" onClick={handleLogin}>
-            Login
-          </Button>
         )}
       </Sider>
       <Layout>
