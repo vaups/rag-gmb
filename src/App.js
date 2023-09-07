@@ -264,7 +264,6 @@ const App = () => {
           <List
             itemLayout="horizontal"
             dataSource={reviews}
-            loading={loading ? <Spin /> : null}
             renderItem={(review) => (
               <List.Item>
                 <List.Item.Meta
