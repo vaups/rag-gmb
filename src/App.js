@@ -9,9 +9,13 @@ import {
   message,
   Row,
   Col,
-  Spin
+  Spin,
 } from "antd";
-import { UserOutlined, CheckCircleOutlined, StarFilled } from "@ant-design/icons";
+import {
+  UserOutlined,
+  CheckCircleOutlined,
+  StarFilled,
+} from "@ant-design/icons";
 import moment from "moment";
 
 const { Sider, Content, Footer } = Layout;
@@ -28,15 +32,26 @@ const App = () => {
     color: "white",
   };
   const renderStars = (rating) => {
+    const ratingMap = {
+      "one": 1,
+      "two": 2,
+      "three": 3,
+      "four": 4,
+      "five": 5
+    };
+  
+    const numberOfStars = ratingMap[rating.toLowerCase()] || 0;
     const stars = [];
-    for (let i = 0; i < rating; i++) {
+  
+    for (let i = 0; i < numberOfStars; i++) {
       stars.push(<StarFilled key={i} style={{ fontSize: '16px', color: 'gold' }} />);
     }
+  
     return stars;
   };
-  
+
   const formatDate = (dateTime) => {
-    return moment(dateTime).format('MMMM Do, YYYY');
+    return moment(dateTime).format("MMMM Do, YYYY");
   };
 
   // Effect for initial authentication check
@@ -257,58 +272,61 @@ const App = () => {
             </Row>
           )}
           {loading && selectedLocation ? (
-  <Spin tip="Loading reviews...">
-    <List itemLayout="horizontal" />
-  </Spin>
-) : (
-          <List
-            itemLayout="horizontal"
-            dataSource={reviews}
-            renderItem={(review) => (
-              <List.Item>
-                <List.Item.Meta
-                  avatar={
-                    <img
-                      src={review.reviewer.profilePhotoUrl}
-                      alt="Profile"
-                      style={{
-                        width: 50,
-                        height: 50,
-                        alignItems: "center",
-                        padding: "10px",
-                      }}
-                    />
-                  }
-                  title={
-                    <>
-                      <div>
-                        <strong>Name of Reviewer:</strong>{" "}
-                        {review.reviewer.displayName}
-                      </div>
-                      <div>
-                        <strong>Date Posted:</strong>{" "}
-                        {formatDate(review.createTime)}
-                      </div>
-                    </>
-                  }
-                  description={
-                    <>
-                      <div>
-                        <strong>Stars of Review:</strong>{" "}
-                        {renderStars(review.starRating)}<StarFilled />
-                      </div>
-                      <div>
-                        <strong>Comment:</strong> {review.comment}
-                      </div>
-                    </>
-                  }
-                />
-              </List.Item>
-            )}
-          />
+            <Spin tip="Loading reviews...">
+              <List itemLayout="horizontal" />
+            </Spin>
+          ) : (
+            <List
+              itemLayout="horizontal"
+              dataSource={reviews}
+              renderItem={(review) => (
+                <List.Item>
+                  <List.Item.Meta
+                    avatar={
+                      <img
+                        src={review.reviewer.profilePhotoUrl}
+                        alt="Profile"
+                        style={{
+                          width: 50,
+                          height: 50,
+                          alignItems: "center",
+                          padding: "10px",
+                        }}
+                      />
+                    }
+                    title={
+                      <>
+                        <div>
+                          <strong>Name of Reviewer:</strong>{" "}
+                          {review.reviewer.displayName}
+                        </div>
+                        <div>
+                          <strong>Date Posted:</strong>{" "}
+                          {formatDate(review.createTime)}
+                        </div>
+                      </>
+                    }
+                    description={
+                      <>
+                        <div>
+                          <strong>Stars of Review:</strong>{" "}
+                          {renderStars(review.starRating)}
+                        </div>
+                        <div>
+                          <strong>Comment:</strong> {review.comment}
+                        </div>
+                      </>
+                    }
+                  />
+                </List.Item>
+              )}
+            />
           )}
         </Content>
-        <Footer>Reed Automotive Group ©2023</Footer>
+        <Footer>
+          Reed Automotive Group ©2023{" "}
+          <StarFilled style={{ fontSize: "16px", color: "gold" }} />
+        </Footer>
       </Layout>
     </Layout>
   );
