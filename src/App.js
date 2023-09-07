@@ -36,11 +36,11 @@ const App = () => {
   
   useEffect(() => {
     if (!selectedLocation) return;
-
+  
     setLoading(true);
-
+  
     const token = localStorage.getItem("access_token");
-
+  
     fetch(
       `https://backend.gmb.reedauto.com/fetch_reviews?location_name=${selectedLocation}`,
       {
@@ -51,7 +51,7 @@ const App = () => {
     )
     .then((response) => response.json())
     .then((data) => {
-      console.log("Data received:", data);  // Debugging line
+      console.log("Entire data object:", JSON.stringify(data, null, 2)); // Debug line
       if (Array.isArray(data)) {
         setReviews(data);
       } else {
