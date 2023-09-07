@@ -1,6 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { Layout, List, Menu, Avatar, Select, Button, message, Row, Col } from 'antd';
-import { UserOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import React, { useState, useEffect } from "react";
+import {
+  Layout,
+  List,
+  Menu,
+  Avatar,
+  Select,
+  Button,
+  message,
+  Row,
+  Col,
+} from "antd";
+import { UserOutlined, CheckCircleOutlined } from "@ant-design/icons";
 
 const { Sider, Content, Footer } = Layout;
 const { Option } = Select;
@@ -12,8 +22,24 @@ const App = () => {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [loading, setLoading] = useState(false);
   const gradientButtonStyle = {
-    background: 'linear-gradient(to right, #ff9966, #ff5e62)',
-    color: 'white',
+    background: "linear-gradient(to right, #ff9966, #ff5e62)",
+    color: "white",
+  };
+  const renderStars = (rating) => {
+    const stars = [];
+    for (let i = 0; i < rating; i++) {
+      stars.push(
+        <span key={i} style={{ color: "gold" }}>
+          ★
+        </span>
+      );
+    }
+    return stars;
+  };
+
+  const formatDate = (dateTime) => {
+    const date = new Date(dateTime);
+    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   };
 
   // Effect for initial authentication check
@@ -183,16 +209,18 @@ const App = () => {
   return (
     <Layout>
       <Sider width={300} className="ant-layout-sider-light">
-        <Menu mode="vertical" defaultSelectedKeys={['1']}>
+        <Menu mode="vertical" defaultSelectedKeys={["1"]}>
           <Menu.Item key="1">Reviews</Menu.Item>
           <Menu.Item key="2">Approval Board</Menu.Item>
           <Menu.Item key="3">Facebook</Menu.Item>
         </Menu>
-        <div style={{ display: 'flex', alignItems: 'center', padding: '10px' }}>
+        <div style={{ display: "flex", alignItems: "center", padding: "10px" }}>
           {isAuthenticated ? (
             <>
-            <Avatar icon={<CheckCircleOutlined style={{ color: 'lightgreen' }} />} />
-              <span style={{ marginLeft: '10px' }}>Logged In</span>
+              <Avatar
+                icon={<CheckCircleOutlined style={{ color: "lightgreen" }} />}
+              />
+              <span style={{ marginLeft: "10px" }}>Logged In</span>
             </>
           ) : (
             <Button style={gradientButtonStyle} onClick={handleLogin}>
@@ -204,15 +232,23 @@ const App = () => {
       <Layout>
         <Content>
           {isAuthenticated && (
-            <Row justify="center" style={{ padding: '20px', background: 'linear-gradient(to right, #ff9966, #ff5e62)' }}>
-              <Col span={24} style={{ textAlign: 'center' }}>
-                <h2>Welcome! Please select a location to display the reviews.</h2>
+            <Row
+              justify="center"
+              style={{
+                padding: "20px",
+                background: "linear-gradient(to right, #ff9966, #ff5e62)",
+              }}
+            >
+              <Col span={24} style={{ textAlign: "center" }}>
+                <h2>
+                  Welcome! Please select a location to display the reviews.
+                </h2>
               </Col>
-              <Col span={24} style={{ textAlign: 'center' }}>
+              <Col span={24} style={{ textAlign: "center" }}>
                 <Select
                   placeholder="Select a location"
                   onChange={(value) => setSelectedLocation(value)}
-                  style={{ width: '50%' }}
+                  style={{ width: "50%" }}
                 >
                   {Object.keys(LOCATIONS).map((location) => (
                     <Option key={location} value={location}>
@@ -223,50 +259,55 @@ const App = () => {
               </Col>
             </Row>
           )}
-        <List
-          itemLayout="horizontal"
-          dataSource={reviews}
-          renderItem={(review) => (
-            <List.Item>
-              <List.Item.Meta
-                avatar={
-                  <img
-                    src={review.reviewer.profilePhotoUrl}
-                    alt="Profile"
-                    style={{ width: 50, height: 50 }}
-                  />
-                }
-                title={
-                  <>
-                    <div>
-                      <strong>Time of Review:</strong>{" "}
-                      {new Date(review.createTime).toLocaleString()}
-                    </div>
-                    <div>
-                      <strong>Name of Reviewer:</strong>{" "}
-                      {review.reviewer.displayName}
-                    </div>
-                  </>
-                }
-                description={
-                  <>
-                    <div>
-                      <strong>Stars of Review:</strong> {review.starRating}
-                    </div>
-                    <div>
-                      <strong>Comment:</strong> {review.comment}
-                    </div>
-                  </>
-                }
-              />
-            </List.Item>
-          )}
-        />
+          <List
+            itemLayout="horizontal"
+            dataSource={reviews}
+            renderItem={(review) => (
+              <List.Item>
+                <List.Item.Meta
+                  avatar={
+                    <img
+                      src={review.reviewer.profilePhotoUrl}
+                      alt="Profile"
+                      style={{
+                        width: 50,
+                        height: 50,
+                        alignItems: "center",
+                        padding: "10px",
+                      }}
+                    />
+                  }
+                  title={
+                    <>
+                      <div>
+                        <strong>Name of Reviewer:</strong>{" "}
+                        {review.reviewer.displayName}
+                      </div>
+                      <div>
+                        <strong>Date Posted:</strong>{" "}
+                        {formatDate(review.createTime)}
+                      </div>
+                    </>
+                  }
+                  description={
+                    <>
+                      <div>
+                        {renderStars(review.starRating)}
+                      </div>
+                      <div>
+                        <strong>Comment:</strong> {review.comment}
+                      </div>
+                    </>
+                  }
+                />
+              </List.Item>
+            )}
+          />
         </Content>
         <Footer>Reed Automotive Group ©2023</Footer>
       </Layout>
     </Layout>
   );
 };
-        
+
 export default App;
