@@ -295,7 +295,7 @@ const App = () => {
                     <>
                       <div>
                         <strong>Stars of Review:</strong>{" "}
-                        {renderStars(review.starRating)}
+                        {renderStars(review.starRating)}<StarFilled />
                       </div>
                       <div>
                         <strong>Comment:</strong> {review.comment}
