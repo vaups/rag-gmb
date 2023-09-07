@@ -11,8 +11,8 @@ const App = () => {
 
   useEffect(() => {
     // Initial check for authentication based on local storage.
-    const token_id = localStorage.getItem("token_id");
-    if (token_id) {
+    const access_token = localStorage.getItem("access_token");
+    if (access_token) {
       setIsAuthenticated(true);
     } else {
       checkAuthentication(); // If not found in local storage, check server.
@@ -21,34 +21,31 @@ const App = () => {
   
   const handleLogin = () => {
     fetch("https://backend.gmb.reedauto.com/authorize", {
-    credentials: 'include'  // Include credentials
-  })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.authorization_url) {
-          window.location.href = data.authorization_url; // This will reload the page
-        } else if (data.token_id) {
-          localStorage.setItem("token_id", data.token_id);
-          setIsAuthenticated(true);  // <-- Set isAuthenticated to true here
+      credentials: 'include'  // Include credentials
+    })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.access_token) {
+        localStorage.setItem("access_token", data.access_token);  // Store the access token here
+        setIsAuthenticated(true);
         } else {
           message.error("Failed to initiate authentication. Please try again.");
         }
       });
   };
   
-
   useEffect(() => {
     if (!selectedLocation) return;
 
     setLoading(true);
 
-    const token_id = localStorage.getItem("token_id");
+    const token = localStorage.getItem("access_token");
 
     fetch(
       `https://backend.gmb.reedauto.com/fetch_reviews?location_name=${selectedLocation}`,
       {
         headers: {
-          "Token-ID": token_id,
+          'Authorization': `Bearer ${token}`,
         },
       }
     )
