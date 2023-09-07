@@ -52,6 +52,8 @@ const App = () => {
       .then((response) => response.json())
       .then((data) => {
         console.log("Entire data object:", JSON.stringify(data, null, 2)); // Debug line
+        console.log("Parsed data object:", data);
+        console.log("Is parsed data an array?", Array.isArray(data));
         if (Array.isArray(data)) {
           setReviews(data);
         } else {
@@ -66,6 +68,10 @@ const App = () => {
         setLoading(false);
       });
   }, [selectedLocation]);
+
+  useEffect(() => {
+    console.log("Current reviews state:", reviews);
+  }, [reviews]);
 
   const checkAuthentication = () => {
     fetch("https://backend.gmb.reedauto.com/check_auth", {
@@ -175,10 +181,13 @@ const App = () => {
         )}
       </Sider>
       <Layout>
+      
         <List
           itemLayout="horizontal"
           dataSource={reviews}
-          renderItem={(review) => (
+          renderItem={(review) => 
+          console.log("Rendering review:", review)
+           (
             <List.Item>
               <List.Item.Meta
                 avatar={
