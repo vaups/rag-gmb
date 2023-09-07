@@ -52,16 +52,22 @@ const App = () => {
         },
       }
     )
-      .then((response) => response.json())
-      .then((data) => {
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("Data received:", data);  // Debugging line
+      if (Array.isArray(data)) {
         setReviews(data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching reviews:", error);
-        message.error(`Failed to fetch reviews: ${error}`);
-        setLoading(false);
-      });
+      } else {
+        console.warn("Received data is not an array:", data);
+        setReviews([]);  // Reset reviews if data is not valid
+      }
+      setLoading(false);
+    })
+    .catch((error) => {
+      console.error("Error fetching reviews:", error);
+      message.error(`Failed to fetch reviews: ${error}`);
+      setLoading(false);
+    });
   }, [selectedLocation]);
 
   const checkAuthentication = () => {
