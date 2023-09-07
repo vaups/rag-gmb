@@ -182,7 +182,7 @@ const App = () => {
   };
   return (
     <Layout>
-      <Sider width={300}>
+      <Sider width={300} className="ant-layout-sider-light">
         <Menu mode="vertical" defaultSelectedKeys={['1']}>
           <Menu.Item key="1">Reviews</Menu.Item>
           <Menu.Item key="2">Approval Board</Menu.Item>
@@ -191,7 +191,7 @@ const App = () => {
         <div style={{ display: 'flex', alignItems: 'center', padding: '10px' }}>
           {isAuthenticated ? (
             <>
-              <Avatar icon={<CheckCircleOutlined />} />
+            <Avatar icon={<CheckCircleOutlined style={{ color: 'lightgreen' }} />} />
               <span style={{ marginLeft: '10px' }}>Logged In</span>
             </>
           ) : (
@@ -204,7 +204,7 @@ const App = () => {
       <Layout>
         <Content>
           {isAuthenticated && (
-            <Row justify="center" style={{ padding: '20px', background: '#f4f4f4' }}>
+            <Row justify="center" style={{ padding: '20px', background: 'linear-gradient(to right, #ff9966, #ff5e62)' }}>
               <Col span={24} style={{ textAlign: 'center' }}>
                 <h2>Welcome! Please select a location to display the reviews.</h2>
               </Col>
@@ -263,7 +263,7 @@ const App = () => {
           )}
         />
         </Content>
-        <Footer>My Business Reviews ©2023</Footer>
+        <Footer>Reed Automotive Group ©2023</Footer>
       </Layout>
     </Layout>
   );
