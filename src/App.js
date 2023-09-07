@@ -324,8 +324,7 @@ const App = () => {
           )}
         </Content>
         <Footer>
-          Reed Automotive Group ©2023{" "}
-          <StarFilled style={{ fontSize: "16px", color: "gold" }} />
+          Reed Automotive Group ©2023
         </Footer>
       </Layout>
     </Layout>
