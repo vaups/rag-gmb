@@ -9,10 +9,9 @@ import {
   message,
   Row,
   Col,
-  Starfilled,
-  Spin,
+  Spin
 } from "antd";
-import { UserOutlined, CheckCircleOutlined } from "@ant-design/icons";
+import { UserOutlined, CheckCircleOutlined, StarFilled } from "@ant-design/icons";
 import moment from "moment";
 
 const { Sider, Content, Footer } = Layout;
@@ -31,7 +30,7 @@ const App = () => {
   const renderStars = (rating) => {
     const stars = [];
     for (let i = 0; i < rating; i++) {
-      stars.push(<Starfilled key={i} style={{ color: 'gold' }} />);
+      stars.push(<StarFilled key={i} style={{ fontSize: '16px', color: 'gold' }} />);
     }
     return stars;
   };
@@ -257,9 +256,11 @@ const App = () => {
               </Col>
             </Row>
           )}
-          {loading ? (
-            <Spin />
-          ) : (
+          {loading && selectedLocation ? (
+          <Spin tip="Loading reviews...">
+            <List itemLayout="horizontal" />
+          </Spin>
+        ) : (
           <List
             itemLayout="horizontal"
             dataSource={reviews}
