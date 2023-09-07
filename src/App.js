@@ -64,7 +64,7 @@ const App = () => {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-        credentials: 'include',
+        credentials: "include",
       }
     )
       .then((response) => {
@@ -207,46 +207,41 @@ const App = () => {
         <List
           itemLayout="horizontal"
           dataSource={reviews}
-          renderItem={(review) =>
-            console.log(
-              "Rendering review:",
-              review
-            )(
-              <List.Item>
-                <List.Item.Meta
-                  avatar={
-                    <img
-                      src={review.reviewer.profilePhotoUrl}
-                      alt="Profile"
-                      style={{ width: 50, height: 50 }}
-                    />
-                  }
-                  title={
-                    <>
-                      <div>
-                        <strong>Time of Review:</strong>{" "}
-                        {new Date(review.createTime).toLocaleString()}
-                      </div>
-                      <div>
-                        <strong>Name of Reviewer:</strong>{" "}
-                        {review.reviewer.displayName}
-                      </div>
-                    </>
-                  }
-                  description={
-                    <>
-                      <div>
-                        <strong>Stars of Review:</strong> {review.starRating}
-                      </div>
-                      <div>
-                        <strong>Comment:</strong> {review.comment}
-                      </div>
-                    </>
-                  }
-                />
-              </List.Item>
-            )
-          }
+          renderItem={(review) => (
+            <List.Item>
+              <List.Item.Meta
+                avatar={
+                  <img
+                    src={review.reviewer.profilePhotoUrl}
+                    alt="Profile"
+                    style={{ width: 50, height: 50 }}
+                  />
+                }
+                title={
+                  <>
+                    <div>
+                      <strong>Time of Review:</strong>{" "}
+                      {new Date(review.createTime).toLocaleString()}
+                    </div>
+                    <div>
+                      <strong>Name of Reviewer:</strong>{" "}
+                      {review.reviewer.displayName}
+                    </div>
+                  </>
+                }
+                description={
+                  <>
+                    <div>
+                      <strong>Stars of Review:</strong> {review.starRating}
+                    </div>
+                    <div>
+                      <strong>Comment:</strong> {review.comment}
+                    </div>
+                  </>
+                }
+              />
+            </List.Item>
+          )}
         />
         <Footer>My Business Reviews ©2023</Footer>
       </Layout>
