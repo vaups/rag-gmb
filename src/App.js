@@ -9,8 +9,11 @@ import {
   message,
   Row,
   Col,
+  Starfilled,
+  Spin,
 } from "antd";
 import { UserOutlined, CheckCircleOutlined } from "@ant-design/icons";
+import moment from "moment";
 
 const { Sider, Content, Footer } = Layout;
 const { Option } = Select;
@@ -28,18 +31,13 @@ const App = () => {
   const renderStars = (rating) => {
     const stars = [];
     for (let i = 0; i < rating; i++) {
-      stars.push(
-        <span key={i} style={{ color: "gold" }}>
-          ★
-        </span>
-      );
+      stars.push(<Starfilled key={i} style={{ color: 'gold' }} />);
     }
     return stars;
   };
-
+  
   const formatDate = (dateTime) => {
-    const date = new Date(dateTime);
-    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+    return moment(dateTime).format('MMMM Do, YYYY');
   };
 
   // Effect for initial authentication check
@@ -259,9 +257,13 @@ const App = () => {
               </Col>
             </Row>
           )}
+          {loading ? (
+            <Spin />
+          ) : (
           <List
             itemLayout="horizontal"
             dataSource={reviews}
+            loading={loading ? <Spin /> : null}
             renderItem={(review) => (
               <List.Item>
                 <List.Item.Meta
@@ -292,6 +294,7 @@ const App = () => {
                   description={
                     <>
                       <div>
+                        <strong>Stars of Review:</strong>{" "}
                         {renderStars(review.starRating)}
                       </div>
                       <div>
@@ -303,6 +306,7 @@ const App = () => {
               </List.Item>
             )}
           />
+          )}
         </Content>
         <Footer>Reed Automotive Group ©2023</Footer>
       </Layout>
