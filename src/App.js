@@ -4,21 +4,37 @@ const { Sider, Content, Footer } = Layout;
 const { Option } = Select;
 
 const App = () => {
+  // State variables
   const [reviews, setReviews] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  // Effect for initial authentication check
   useEffect(() => {
-    // Initial check for authentication based on local storage.
     const access_token = localStorage.getItem("access_token");
     if (access_token) {
       setIsAuthenticated(true);
     } else {
-      checkAuthentication(); // If not found in local storage, check server.
+      checkAuthentication();
     }
   }, []);
 
+  // Effect for fetching reviews
+  useEffect(() => {
+    if (!selectedLocation) return;
+
+    setLoading(true);
+    const token = localStorage.getItem("access_token");
+    fetchReviews(token, selectedLocation);
+  }, [selectedLocation]);
+
+  // Effect for logging the current state of reviews
+  useEffect(() => {
+    console.log("Current reviews state:", reviews);
+  }, [reviews]);
+
+  // Function to initiate login process
   const handleLogin = () => {
     fetch("https://backend.gmb.reedauto.com/authorize", {
       credentials: "include", // Include credentials
@@ -34,12 +50,13 @@ const App = () => {
       });
   };
 
-  useEffect(() => {
-    if (!selectedLocation) return;
-
-    setLoading(true);
-
-    const token = localStorage.getItem("access_token");
+  // Function to fetch reviews from the backend
+  const fetchReviews = (token, selectedLocation) => {
+    // Debug line to check the fetch URL
+    console.log(
+      "Fetch URL:",
+      `https://backend.gmb.reedauto.com/fetch_reviews?location_name=${selectedLocation}`
+    );
 
     fetch(
       `https://backend.gmb.reedauto.com/fetch_reviews?location_name=${selectedLocation}`,
@@ -49,30 +66,35 @@ const App = () => {
         },
       }
     )
-      .then((response) => response.json())
+      .then((response) => {
+        // Debug line to check the raw response
+        console.log("Raw response:", response);
+        return response.json();
+      })
       .then((data) => {
-        console.log("Entire data object:", JSON.stringify(data, null, 2)); // Debug line
-        console.log("Parsed data object:", data);
-        console.log("Is parsed data an array?", Array.isArray(data));
+        console.log("Entire data object:", JSON.stringify(data, null, 2)); // Existing debug line
+        console.log("Parsed data object:", data); // Existing debug line
+        console.log("Is parsed data an array?", Array.isArray(data)); // Existing debug line
+
+        // Debug line to check the type of received data
+        console.log(`Type of received data: ${typeof data}`);
+
         if (Array.isArray(data)) {
           setReviews(data);
         } else {
-          console.warn("Received data is not an array:", data);
+          console.warn("Received data is not an array:", data); // Existing debug line
           setReviews([]); // Reset reviews if data is not valid
         }
         setLoading(false);
       })
       .catch((error) => {
-        console.error("Error fetching reviews:", error);
-        message.error(`Failed to fetch reviews: ${error}`);
+        console.error("Error fetching reviews:", error); // Existing debug line
+        message.error(`Failed to fetch reviews: ${error}`); // Existing debug line
         setLoading(false);
       });
-  }, [selectedLocation]);
+  };
 
-  useEffect(() => {
-    console.log("Current reviews state:", reviews);
-  }, [reviews]);
-
+  // Function to check authentication
   const checkAuthentication = () => {
     fetch("https://backend.gmb.reedauto.com/check_auth", {
       credentials: "include", // Include credentials
@@ -85,7 +107,7 @@ const App = () => {
       });
   };
 
-  // Constants
+  // Location Constant
   const LOCATIONS = {
     "Reed Jeep Chrysler Dodge Ram of Kansas City Service Center": [
       "107525660123223074874",
@@ -154,11 +176,11 @@ const App = () => {
 
   return (
     <Layout>
-      <Sider width={200}>
+      <Sider width={300}>
         <Menu mode="vertical" defaultSelectedKeys={["1"]}>
           <Menu.Item key="1">Reviews</Menu.Item>
-          <Menu.Item key="1">Maia</Menu.Item>
-          <Menu.Item key="1">Jake</Menu.Item>
+          <Menu.Item key="2">Approval Board</Menu.Item>
+          <Menu.Item key="3">Facebook</Menu.Item>
         </Menu>
         {isAuthenticated ? (
           <>
@@ -181,47 +203,49 @@ const App = () => {
         )}
       </Sider>
       <Layout>
-      
         <List
           itemLayout="horizontal"
           dataSource={reviews}
-          renderItem={(review) => 
-          console.log("Rendering review:", review)
-           (
-            <List.Item>
-              <List.Item.Meta
-                avatar={
-                  <img
-                    src={review.reviewer.profilePhotoUrl}
-                    alt="Profile"
-                    style={{ width: 50, height: 50 }}
-                  />
-                }
-                title={
-                  <>
-                    <div>
-                      <strong>Time of Review:</strong>{" "}
-                      {new Date(review.createTime).toLocaleString()}
-                    </div>
-                    <div>
-                      <strong>Name of Reviewer:</strong>{" "}
-                      {review.reviewer.displayName}
-                    </div>
-                  </>
-                }
-                description={
-                  <>
-                    <div>
-                      <strong>Stars of Review:</strong> {review.starRating}
-                    </div>
-                    <div>
-                      <strong>Comment:</strong> {review.comment}
-                    </div>
-                  </>
-                }
-              />
-            </List.Item>
-          )}
+          renderItem={(review) =>
+            console.log(
+              "Rendering review:",
+              review
+            )(
+              <List.Item>
+                <List.Item.Meta
+                  avatar={
+                    <img
+                      src={review.reviewer.profilePhotoUrl}
+                      alt="Profile"
+                      style={{ width: 50, height: 50 }}
+                    />
+                  }
+                  title={
+                    <>
+                      <div>
+                        <strong>Time of Review:</strong>{" "}
+                        {new Date(review.createTime).toLocaleString()}
+                      </div>
+                      <div>
+                        <strong>Name of Reviewer:</strong>{" "}
+                        {review.reviewer.displayName}
+                      </div>
+                    </>
+                  }
+                  description={
+                    <>
+                      <div>
+                        <strong>Stars of Review:</strong> {review.starRating}
+                      </div>
+                      <div>
+                        <strong>Comment:</strong> {review.comment}
+                      </div>
+                    </>
+                  }
+                />
+              </List.Item>
+            )
+          }
         />
         <Footer>My Business Reviews ©2023</Footer>
       </Layout>
