@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Layout, List, Menu, Avatar, Select, Button, message } from 'antd';
+import { Layout, List, Menu, Avatar, Select, Button, message, Row, Col } from 'antd';
 import { UserOutlined, CheckCircleOutlined } from '@ant-design/icons';
-import { theme } from 'antd';
 
-const { Sider, Footer } = Layout;
+const { Sider, Content, Footer } = Layout;
 const { Option } = Select;
 
 const App = () => {
@@ -12,8 +11,9 @@ const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [loading, setLoading] = useState(false);
-  const gradientStyle = {
+  const gradientButtonStyle = {
     background: 'linear-gradient(to right, #ff9966, #ff5e62)',
+    color: 'white',
   };
 
   // Effect for initial authentication check
@@ -182,7 +182,7 @@ const App = () => {
   };
   return (
     <Layout>
-      <Sider width={300} style={gradientStyle}>
+      <Sider width={300}>
         <Menu mode="vertical" defaultSelectedKeys={['1']}>
           <Menu.Item key="1">Reviews</Menu.Item>
           <Menu.Item key="2">Approval Board</Menu.Item>
@@ -192,41 +192,37 @@ const App = () => {
           {isAuthenticated ? (
             <>
               <Avatar icon={<CheckCircleOutlined />} />
-              <span style={{ marginLeft: '10px', fontFamily: 'Arial, sans-serif' }}>Logged In</span>
+              <span style={{ marginLeft: '10px' }}>Logged In</span>
             </>
           ) : (
-            <Menu mode="inline">
-              <Menu.Item
-                key="login"
-                icon={<UserOutlined />}
-                onClick={handleLogin}
-                style={{ fontFamily: 'Arial, sans-serif', transition: '0.3s', cursor: 'pointer' }}
-                onMouseOver={(e) => (e.currentTarget.style.color = '#ff5e62')}
-                onMouseOut={(e) => (e.currentTarget.style.color = '')}
-              >
-                Login
-              </Menu.Item>
-            </Menu>
+            <Button style={gradientButtonStyle} onClick={handleLogin}>
+              Login
+            </Button>
           )}
         </div>
-        {isAuthenticated && (
-          <>
-            <span style={{ fontFamily: 'Arial, sans-serif' }}>Welcome!</span>
-            <Select
-              placeholder="Select a location"
-              onChange={(value) => setSelectedLocation(value)}
-              style={{ fontFamily: 'Arial, sans-serif' }}
-            >
-              {Object.keys(LOCATIONS).map((location) => (
-                <Option key={location} value={location}>
-                  {location}
-                </Option>
-              ))}
-            </Select>
-          </>
-        )}
       </Sider>
       <Layout>
+        <Content>
+          {isAuthenticated && (
+            <Row justify="center" style={{ padding: '20px', background: '#f4f4f4' }}>
+              <Col span={24} style={{ textAlign: 'center' }}>
+                <h2>Welcome! Please select a location to display the reviews.</h2>
+              </Col>
+              <Col span={24} style={{ textAlign: 'center' }}>
+                <Select
+                  placeholder="Select a location"
+                  onChange={(value) => setSelectedLocation(value)}
+                  style={{ width: '50%' }}
+                >
+                  {Object.keys(LOCATIONS).map((location) => (
+                    <Option key={location} value={location}>
+                      {location}
+                    </Option>
+                  ))}
+                </Select>
+              </Col>
+            </Row>
+          )}
         <List
           itemLayout="horizontal"
           dataSource={reviews}
@@ -266,10 +262,11 @@ const App = () => {
             </List.Item>
           )}
         />
+        </Content>
         <Footer>My Business Reviews ©2023</Footer>
       </Layout>
     </Layout>
   );
 };
-
+        
 export default App;
