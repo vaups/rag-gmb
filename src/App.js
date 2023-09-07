@@ -26,7 +26,8 @@ const App = () => {
     .then((response) => response.json())
     .then((data) => {
       if (data.authorization_url) {
-        window.open(data.authorization_url, '_blank'); // Open the Google login in a new tab
+        // Redirect the user to Google's OAuth2 authorization page
+        window.location.href = data.authorization_url;
       } else {
         message.error("Failed to initiate authentication. Please try again.");
       }
