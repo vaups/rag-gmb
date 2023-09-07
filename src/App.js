@@ -38,12 +38,12 @@ const App = () => {
   
 
   useEffect(() => {
-    if (!selectedLocation) return;
-
+    if (!selectedLocation || !isAuthenticated) return;
+  
     setLoading(true);
-
+  
     const token_id = localStorage.getItem("token_id");
-
+  
     fetch(
       `https://backend.gmb.reedauto.com/fetch_reviews?location_name=${selectedLocation}`,
       {
@@ -52,23 +52,31 @@ const App = () => {
         },
       }
     )
-    .then((response) => response.json())
-    .then((data) => {
-      console.log("Data received:", data);  // Debugging line
-      if (Array.isArray(data)) {
-        setReviews(data);
-      } else {
-        console.warn("Received data is not an array:", data);
-        setReviews([]);  // Reset reviews if data is not valid
-      }
-      setLoading(false);
-    })
-    .catch((error) => {
-      console.error("Error fetching reviews:", error);
-      message.error(`Failed to fetch reviews: ${error}`);
-      setLoading(false);
-    });
-  }, [selectedLocation]);
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Data received:", data);
+  
+        if (data.authorization_url) {
+          console.warn("Authorization required. Redirecting...");
+          window.location.href = data.authorization_url;
+          return;
+        }
+  
+        if (Array.isArray(data)) {
+          setReviews(data);
+        } else {
+          console.warn("Received data is not an array:", data);
+          setReviews([]);
+        }
+  
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching reviews:", error);
+        message.error(`Failed to fetch reviews: ${error}`);
+        setLoading(false);
+      });
+  }, [selectedLocation, isAuthenticated]);
 
   const checkAuthentication = () => {
     fetch("https://backend.gmb.reedauto.com/check_auth", {
