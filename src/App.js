@@ -64,6 +64,7 @@ const App = () => {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        credentials: 'include',
       }
     )
       .then((response) => {
